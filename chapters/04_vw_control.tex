@@ -1,0 +1,148 @@
+% =============================================================================
+\section{$v$/$w$ Control: Kinematics and PID Design}
+\label{sec:vw}
+% =============================================================================
+
+\begin{center}
+\noteto{Francisco}{Please look into this section and add supporting pictures/screenshots (e.g.\ real thruster mixing test, PID step-response plots from bench/pool tests, autotuner limit-cycle capture) wherever useful.}
+\end{center}
+
+\subsection{Body-frame kinematics}
+
+Lily is modeled as a planar, differential-thrust (skid-steered) surface vehicle. Let $v$ denote surge (forward) speed and $w$ the yaw rate, both expressed in the body frame and measured from the fused odometry (\texttt{odom.twist.twist.linear.x}, \texttt{odom.twist.twist.angular.z}). Ignoring sway (no side-thruster authority) the rigid-body equations of motion are
+\begin{align}
+m\,\dot v  &= F_{\text{surge}} - d_v(v)\,v, \label{eq:surgeeom}\\
+I_z\,\dot w &= M_{\text{yaw}} - d_w(w)\,w, \label{eq:yaweom}
+\end{align}
+with $m\approx 42$\,kg, $I_z \approx 26\ \text{kg}\,\text{m}^2$ (per the controller configuration comments -- \todored{replace with measured mass/inertia}), and $d_v(\cdot)$, $d_w(\cdot)$ lumped (possibly speed-dependent) hydrodynamic drag terms that are not modeled explicitly -- instead, their effect is compensated for by the feedback PID controller of Section~\ref{sec:pid} and identified indirectly through relay-based autotuning (Section~\ref{sec:autotune}). See Section~\ref{sec:dynamics} for a more complete treatment of the underlying vehicle dynamics.
+
+\subsection{Thruster mixing}
+\label{sec:mixing}
+
+The two collinear, aft-mounted thrusters can only produce a surge force and a yaw moment about \texttt{base\_link} (no direct sway or roll authority):
+\begin{align}
+F_{\text{surge}} &= T_{\text{left}} + T_{\text{right}}, \\
+M_{\text{yaw}} &= (T_{\text{right}} - T_{\text{left}})\cdot \frac{L}{2}, \qquad L = 0.66\ \text{m (wheel\_base)}.
+\end{align}
+Inverting this $2\times2$ linear mixer gives the thrust allocation actually implemented in \texttt{velocity\_controller.cpp}:
+\begin{align}
+T_{\text{left}}  &= \tfrac{1}{2}F_{\text{surge}} - \frac{M_{\text{yaw}}}{L}, \label{eq:mixL}\\
+T_{\text{right}} &= \tfrac{1}{2}F_{\text{surge}} + \frac{M_{\text{yaw}}}{L}. \label{eq:mixR}
+\end{align}
+Both are subsequently clamped to $\pm T_{\max}$ (\texttt{max\_thrust}).
+
+\subsection{Decoupled surge/yaw PID}
+\label{sec:pid}
+
+Surge and yaw are controlled by two independent PID loops running at $f_s=$\texttt{loop\_rate\_hz}$=50$\,Hz ($\Delta t = 1/f_s$), closing around the fused-odometry measurements $v_{\text{meas}}, w_{\text{meas}}$ against the commanded $v_{\text{cmd}}, w_{\text{cmd}}$ (from \texttt{/cmd\_vel}, itself produced either by the ILOS guidance law of Section~\ref{sec:ilos} or an operator teleop command):
+\begin{align}
+e_v[k] &= v_{\text{cmd}}[k] - v_{\text{meas}}[k], &
+e_w[k] &= w_{\text{cmd}}[k] - w_{\text{meas}}[k].
+\end{align}
+The derivative term is computed \emph{on the measurement} rather than on the error, which avoids the classical ``derivative kick'' whenever the setpoint changes abruptly:
+\begin{align}
+\dot v_{\text{meas}}[k] &\approx -\frac{v_{\text{meas}}[k]-v_{\text{meas}}[k-1]}{\Delta t}, &
+\dot w_{\text{meas}}[k] &\approx -\frac{w_{\text{meas}}[k]-w_{\text{meas}}[k-1]}{\Delta t}.
+\end{align}
+The PID outputs (a force and a moment, i.e.\ the gains carry physical units $\text{N}/(\text{m/s})$ and $\text{N}\!\cdot\!\text{m}/(\text{rad/s})$) are
+\begin{align}
+F_{\text{surge}}[k] &= k_{v,p}\,e_v[k] + k_{v,i}\,I_v[k] + k_{v,d}\,\dot v_{\text{meas}}[k], \label{eq:pidF}\\
+M_{\text{yaw}}[k]   &= k_{w,p}\,e_w[k] + k_{w,i}\,I_w[k] + k_{w,d}\,\dot w_{\text{meas}}[k], \label{eq:pidM}
+\end{align}
+with integral states updated \emph{after} the tentative output is computed, using \emph{directional} anti-windup: the integral is only allowed to accumulate further in the direction that would deepen an already-saturated output; it may always unwind:
+\begin{align}
+I_v[k] &=
+\begin{cases}
+\operatorname{clamp}\!\big(I_v[k-1] + e_v[k]\Delta t,\; -I_{v,\max},\, I_{v,\max}\big) & \text{if not saturated, or } e_v[k]\cdot I_v[k-1] < 0\\
+I_v[k-1] & \text{otherwise (blocked)}
+\end{cases}
+\end{align}
+(analogously for $I_w$), where "saturated" means $|T_{\text{left}}|\!\geq\! T_{\max}$ or $|T_{\text{right}}|\!\geq\! T_{\max}$ \emph{after} mixing (Eqs.~\eqref{eq:mixL}--\eqref{eq:mixR}), and $I_{v,\max}=$\texttt{v\_int\_max}, $I_{w,\max}=$\texttt{w\_int\_max}. Finally $F_{\text{surge}}, M_{\text{yaw}}$ are mixed into $T_{\text{left}}, T_{\text{right}}$ and clamped to $\pm T_{\max}$.
+
+A per-side slew-rate limiter (\texttt{SlewRateLimiter}, max rate \texttt{max\_thrust\_rate}) is applied to the final thrust commands \emph{after} mixing, in every control mode (including MANUAL and TELEOP), to protect the driveline from step commands:
+\begin{equation}
+T_{\text{side}}[k] = T_{\text{side}}[k-1] + \operatorname{clamp}\!\Big(T_{\text{side}}^{\text{cmd}}[k]-T_{\text{side}}[k-1],\, -\dot T_{\max}\Delta t,\ \dot T_{\max}\Delta t\Big).
+\end{equation}
+
+\begin{table}[H]
+\centering
+\caption{Decoupled PID gains, integral limits and slew rate (surge $v$ and yaw $w$).}
+\label{tab:pid}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Config & $k_{v,p}$ & $k_{v,i}$ & $k_{v,d}$ & $I_{v,\max}$ & $T_{\max}$ [N] & $\dot T_{\max}$ [N/s]\\
+\midrule
+Simulation (\texttt{velocity\_controller\_sim.yaml}) & 172.0 & 41.0 & 58.0 & 10.0 & 100 & 200 \\
+Real vehicle (\texttt{velocity\_controller\_real.yaml}) & 50.0 & 20.0 & 40.0 & 1.0 & 100 & 100\\
+\bottomrule
+\end{tabular}
+\vspace{4pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Config & $k_{w,p}$ & $k_{w,i}$ & $k_{w,d}$ & $I_{w,\max}$ \\
+\midrule
+Simulation & 660.0 & 300.0 & 40.0 & 10.0 \\
+Real vehicle & 50.0 & 10.0 & 10.0 & 1.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Both configurations share $L=0.66$\,m, $f_s=50$\,Hz, \texttt{cmd\_timeout}$=0.5$\,s (command watchdog: \texttt{/cmd\_vel} is zeroed if stale). \todored{The simulation gains were obtained from the adaptive relay autotuner (Section~\ref{sec:autotune}) and are noticeably higher than the hand-tuned real-vehicle gains -- re-run the autotuner on the real boat once in-water access is available and update this table with the resulting $K_u$, $T_u$ and final gains.}
+
+\subsection{Relay-feedback PID autotuning}
+\label{sec:autotune}
+
+Both an offline (\texttt{relay\_autotuner.py}) and an adaptive online variant (\texttt{adaptive\_relay\_autotuner.py}) implement the classical \textbf{Åström--Hägglund relay-feedback method} to identify the plant's ultimate gain and period without needing an explicit dynamic model. The velocity PID is bypassed and a relay of amplitude $d$ drives $F_{\text{surge}}$ (surge test) or $M_{\text{yaw}}$ (yaw test, with a small constant forward force $F_f$ superimposed so the differential thruster pair retains authority) directly:
+\begin{equation}
+u(t) = d\cdot\operatorname{sign}\big(e(t)\big), \qquad e(t) = \text{setpoint} - \text{measurement},
+\end{equation}
+with hysteresis $\varepsilon$ on the sign decision to reject chatter. Under relay feedback the plant settles into a limit cycle of period $T_u$ and amplitude $a$. The describing function of an ideal relay is $N(a) = 4d/(\pi a)$; imposing the Barkhausen criterion $G(j\omega_u)N(a)=-1$ at the limit-cycle frequency $\omega_u = 2\pi/T_u$ gives the ultimate gain and period:
+\begin{equation}
+K_u = \frac{4d}{\pi a}, \qquad T_u = \text{measured oscillation period}.
+\end{equation}
+Convergence is declared once the coefficient of variation of amplitude and period over the most recent full cycles drops below a tolerance (5\% by default). Three tuning rules are implemented (Table~\ref{tab:tuningrules}); \textbf{Tyreus--Luyben} is the default, chosen for its lower overshoot ($\sim$15\%) on integrating, sluggish, marine-type plants compared to classical Ziegler--Nichols ($\sim$40\% overshoot):
+\begin{align}
+K_p &= K_u/3.2, & K_i &= \frac{K_p}{2.2\,T_u}, & K_d &= \frac{K_p\,T_u}{6.3}. &&\text{(Tyreus--Luyben)}
+\end{align}
+
+\begin{table}[H]
+\centering
+\caption{Relay-autotuner tuning rules implemented in \texttt{relay\_autotuner.py}.}
+\label{tab:tuningrules}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Rule & $K_p$ & $K_i$ & $K_d$ \\
+\midrule
+Tyreus--Luyben (default) & $K_u/3.2$ & $K_p/(2.2\,T_u)$ & $K_p T_u/6.3$ \\
+Ziegler--Nichols (closed loop) & $0.6\,K_u$ & $K_p/(0.5\,T_u)$ & $0.125\,K_p T_u$ \\
+Conservative (PI only) & $K_u/4.5$ & $K_p/(2.5\,T_u)$ & $0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The \emph{adaptive} variant additionally re-tunes the relay amplitude $d$ and hysteresis $\varepsilon$ online between half-cycles: it increases $d$ if the limit-cycle amplitude is buried in the hysteresis band (weak signal), increases $\varepsilon$ if half-cycles are too short (chattering), decreases $d$ on over-excitation, and bumps $d$ upward if no zero-crossing is observed for longer than \texttt{stalled\_cycle\_warn\_sec} (stalled/unreachable setpoint) -- up to a bounded adaptation budget before aborting.
+
+\todored{Insert the actual $K_u$, $T_u$, limit-cycle amplitude $a$ and resulting gains reported by the autotuner run(s) that produced Table~\ref{tab:pid}'s simulation gains, and (once available) the real-vehicle run.}
+
+\subsection{Mode state machine}
+
+\texttt{ControlLogic} is the sole owner of a 4-state mode machine (Figure~\ref{fig:fsm}) and the sole gate to the autopilot's \texttt{SetMode}/arming services; RC input always has final authority. \texttt{MissionManager} (Section~\ref{sec:mission}) never asserts a mode directly -- it requests \texttt{GUIDED}/\texttt{POSHOLD} through a service that \texttt{ControlLogic} may reject while RC override is active.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[>=Stealth,node distance=22mm,every node/.style={font=\footnotesize}]
+\tikzstyle{st}=[draw,rounded corners,fill=blue!7,minimum width=2.6cm,minimum height=1cm,align=center]
+\node[st] (manual) {MANUAL\\RC$\to$thrust};
+\node[st,right=of manual] (guided) {GUIDED\\PID from /cmd\_vel};
+\node[st,below=of manual] (pos) {POSITION\_HOLD\\zero thrust};
+\node[st,below=of guided] (teleop) {TELEOP\\open-loop twist};
+\draw[->] (manual) to[bend left=15] node[above]{RC ch5} (guided);
+\draw[->] (guided) to[bend left=15] node[below]{RC ch4} (manual);
+\draw[->] (manual) -- node[left]{RC ch6} (pos);
+\draw[->] (pos) -- node[left]{RC ch4} (manual);
+\draw[->] (guided) -- node[right]{RC ch7} (teleop);
+\draw[->] (teleop) -- node[right]{RC ch4} (manual);
+\end{tikzpicture}
+\caption{\texttt{ControlLogic} mode FSM. Edge-triggered RC channel thresholds ($>1600\,\mu\text{s}$) drive transitions; only a GUIDED $\to$ MANUAL/POSITION\_HOLD/TELEOP switch from RC is a hard override that blocks MissionManager's software requests.}
+\label{fig:fsm}
+\end{figure}

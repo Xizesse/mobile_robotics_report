@@ -1,0 +1,12 @@
+% =============================================================================
+\section{Vehicle Dynamics}
+\label{sec:dynamics}
+% =============================================================================
+
+\begin{center}
+\noteto{Diogo}{Could you work on this section a bit? The idea is a short, more mechanical/physics-oriented treatment of Lily's vehicle dynamics (rigid-body equations of motion, added mass, hydrodynamic damping, etc.) to complement the control-oriented surge/yaw model in Section~\ref{sec:vw}. Feel free to pull from the marine/robot-vehicle-dynamics class notes -- a standard 3-DOF (surge, sway, yaw) surface-vehicle model (e.g.\ Fossen-style $M\dot\nu + C(\nu)\nu + D(\nu)\nu = \tau$) would fit well here. Doesn't need to be long, just enough to justify the simplified model used later in the report.}
+\end{center}
+
+This section is intended to give a brief, physics-first description of the rigid-body and hydrodynamic effects governing Lily's motion in the horizontal plane, before Section~\ref{sec:vw} simplifies this down to the decoupled surge/yaw model actually used by the controller.
+
+\todored{Placeholder -- add: (i) the 3-DOF rigid-body equations of motion in body-fixed coordinates; (ii) added-mass and hydrodynamic damping terms relevant to a planar USV hull; (iii) any simplifying assumptions (e.g.\ neglecting sway/roll authority) that justify the decoupled surge/yaw model used in Section~\ref{sec:vw}.}

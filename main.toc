@@ -1,0 +1,32 @@
+\contentsline {section}{\numberline {1}The System}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Vehicle configuration and thruster layout}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Compute and communications architecture}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Localization: IMU/GPS fusion}{4}{subsection.1.3}%
+\contentsline {section}{\numberline {2}Motor Calibration}{5}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Thrust-to-duty-cycle shaping (\texttt {motor\_thrust2RPM})}{5}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}VESC configuration and FOC commutation}{6}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Thrust curve (ERPM $\rightarrow $ thrust)}{6}{subsection.2.3}%
+\contentsline {section}{\numberline {3}Vehicle Dynamics}{7}{section.3}%
+\contentsline {section}{\numberline {4}$v$/$w$ Control: Kinematics and PID Design}{7}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Body-frame kinematics}{7}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Thruster mixing}{8}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Decoupled surge/yaw PID}{8}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Relay-feedback PID autotuning}{9}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Mode state machine}{10}{subsection.4.5}%
+\contentsline {section}{\numberline {5}Trajectory Following: Integral Line-Of-Sight (ILOS) Guidance}{10}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Path-frame errors}{10}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Lookahead point and ILOS heading law}{11}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Speed law}{11}{subsection.5.3}%
+\contentsline {section}{\numberline {6}Trajectory Generation from Waypoints: Mission Manager}{12}{section.6}%
+\contentsline {subsection}{\numberline {6.1}GPS $\to $ local ENU conversion}{12}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Mission finite-state machine}{12}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Example missions}{13}{subsection.6.3}%
+\contentsline {section}{\numberline {7}Simulation Environment (\texttt {lily\_gz})}{13}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Overview}{14}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Environmental plugins: waves and wind}{14}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Vehicle model and worlds}{14}{subsection.7.3}%
+\contentsline {section}{\numberline {8}Results}{14}{section.8}%
+\contentsline {subsection}{\numberline {8.1}$v$/$w$ tracking performance}{15}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Trajectory-following performance}{16}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Discussion}{16}{subsection.8.3}%
+\contentsline {section}{Conclusion}{17}{section*.23}%

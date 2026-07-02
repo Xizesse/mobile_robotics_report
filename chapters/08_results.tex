@@ -1,0 +1,59 @@
+% =============================================================================
+\section{Results}
+\label{sec:results}
+% =============================================================================
+
+\begin{center}
+\noteto{Francisco}{This section is yours too -- please fill in the real logs/plots/numbers below once available (from pool/lake/field tests or simulation runs), and add the actual figures in place of the placeholders.}
+\end{center}
+
+This section reports closed-loop performance for (i) the decoupled $v$/$w$ velocity controller (Section~\ref{sec:vw}) in isolation, and (ii) the full ILOS trajectory-following stack (Section~\ref{sec:ilos}--\ref{sec:mission}) on the example missions of Table~\ref{tab:missions}. \todored{All figures and numeric values in this section are placeholders. Replace each placeholder box with the corresponding plot (e.g.\ exported from a rosbag via \texttt{rqt\_plot}/\texttt{plotjuggler}/matplotlib) and fill in the tables once logs from the pool/lake/field tests (or simulation runs) are available.}
+
+\subsection{$v$/$w$ tracking performance}
+
+\textbf{Test protocol.} \todored{Describe exactly how the step tests were run: which mode (GUIDED), commanded step amplitude(s) for $v_{\text{cmd}}$ and $w_{\text{cmd}}$, test duration, environment (pool / lake / simulation), and whether surge and yaw were tested independently or jointly.}
+
+\placeholderfig{11}{5}{Surge velocity step response: $v_{\text{meas}}(t)$ vs.\ $v_{\text{cmd}}(t)$ for a representative step (e.g.\ $0\to0.5$~m/s). Overlay the commanded step and measured response; annotate rise time, overshoot and settling band.}
+
+\placeholderfig{11}{5}{Yaw-rate step response: $w_{\text{meas}}(t)$ vs.\ $w_{\text{cmd}}(t)$ for a representative step (e.g.\ $0\to0.3$~rad/s).}
+
+\begin{table}[H]
+\centering
+\caption{Velocity-tracking performance metrics (fill in from step-response logs).}
+\label{tab:vwresults}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Axis & Rise time (10--90\%) & Overshoot [\%] & Settling time (2\%) & Steady-state error\\
+\midrule
+Surge $v$ & \tbd & \tbd & \tbd & \tbd \\
+Yaw $w$ & \tbd & \tbd & \tbd & \tbd \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Trajectory-following performance}
+
+\placeholderfig{11}{7}{Executed path (ENU) vs.\ commanded waypoint path for the \{square / Viana buoys\} mission -- overlay \texttt{mission\_path\_enu} (commanded) against the logged \texttt{/usv/lily/mavros/local\_position/odom} trace (executed), with waypoint markers and arrival-radius circles.}
+
+\placeholderfig{11}{4.5}{Cross-track error $e_y(t)$ over the course of the mission, with the $\pm R_{\text{wp}}$ tolerance band shown for reference.}
+
+\begin{table}[H]
+\centering
+\caption{Trajectory-following performance metrics (fill in per mission).}
+\label{tab:ilosresults}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Metric & Square mission & Viana buoys mission \\
+\midrule
+RMS cross-track error $e_y$ & \tbd & \tbd \\
+Max $|e_y|$ & \tbd & \tbd \\
+Mean waypoint arrival error & \tbd & \tbd \\
+Total mission time & \tbd & \tbd \\
+Number of RC pause/resume events & \tbd & \tbd \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Discussion}
+
+\todored{Once the above tables/figures are filled in: (1) comment on whether the simulation-derived PID gains (Table~\ref{tab:pid}) transferred acceptably to the real vehicle or needed re-tuning; (2) comment on whether $k_i=0$ (ILOS integral disabled, Table~\ref{tab:ilosparams}) was sufficient given observed cross-track error, or whether enabling the integral term is recommended for future missions; (3) note any observed thruster saturation, RC-override events, or GPS/EKF glitches that affected the results.}

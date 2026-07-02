@@ -1,0 +1,67 @@
+% =============================================================================
+\section{Trajectory Generation from Waypoints: Mission Manager}
+\label{sec:mission}
+% =============================================================================
+
+\subsection{GPS $\to$ local ENU conversion}
+\label{sec:gps2enu}
+
+All guidance math (Section~\ref{sec:ilos}) operates in a local, metric East-North-Up (ENU) frame, while missions are authored in geodetic coordinates (latitude/longitude). \texttt{MissionManager} converts every waypoint once, on receipt of the local datum $(\varphi_0,\lambda_0)$ (Section~\ref{sec:ekf}), using the same flat-Earth (equirectangular) approximation used throughout the stack (accurate for ranges $\lesssim 10$\,km):
+\begin{align}
+x &= (\lambda - \lambda_0)\,\cos(\varphi_0)\cdot k, \\
+y &= (\varphi - \varphi_0)\cdot k, \qquad k = 111319.5\ \text{m/deg (ArduPilot constant} \approx R_\oplus\cdot\pi/180).
+\end{align}
+This gives \texttt{MissionManager} a sequence of local ENU waypoints, which is what is actually handed to the ILOS guidance law leg-by-leg (Section~\ref{sec:ilos}).
+
+\subsection{Mission finite-state machine}
+
+\texttt{MissionManager} sequences a deploy/retrieve-style mission as a 6-state FSM, shown in Figure~\ref{fig:missionfsm}, that advances from waypoint to waypoint and reacts to a small set of service calls and arrival events.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[>=Stealth,node distance=14mm,every node/.style={font=\scriptsize}]
+\tikzstyle{st}=[draw,rounded corners,fill=green!7,minimum width=3.0cm,minimum height=0.9cm,align=center]
+\node[st] (idle) {IDLE\_AT\_BASE};
+\node[st,right=32mm of idle] (deploy) {TRANSITING\\TO\_DEPLOY};
+\node[st,below=of deploy] (atdeploy) {AT\_DEPLOY\\POSITION};
+\node[st,below=of idle] (return) {RETURN\_TO\_BASE};
+\node[st,right=32mm of atdeploy] (landtrans) {TRANSITING\_TO\\LANDING\_POS};
+\node[st,below=of landtrans] (landing) {UAV\_LANDING};
+
+\draw[->] (idle) -- node[above]{svc: prepare\_takeoff} (deploy);
+\draw[->] (deploy) -- node[right]{waypoints reached} (atdeploy);
+\draw[->] (atdeploy) -- node[above]{svc: tookoff} (landtrans);
+\draw[->] (landtrans) -- node[right]{landing pos.\ reached} (landing);
+\draw[->] (landing) -- node[above]{svc: landed} (return);
+\draw[->] (return) -- node[left]{waypoints reached} (idle);
+\draw[->,red,dashed] (landtrans) -- node[right,red]{svc: emergency\_landing} (landing);
+\end{tikzpicture}
+\caption{MissionManager finite-state machine: waypoints are consumed sequentially within each \texttt{TRANSITING\_*} leg, and the FSM advances once the leg's waypoints are reached or the corresponding service is called.}
+\label{fig:missionfsm}
+\end{figure}
+
+\todored{Confirm/describe the cooperating UAV platform and CONOPS behind the deploy/retrieve service names (\texttt{prepare\_takeoff}, \texttt{tookoff}, \texttt{landed}, \texttt{emergency\_landing}), which indicate this mission profile was built for a cooperative USV$\to$UAV deploy/recovery operation.}
+
+\subsection{Example missions}
+
+Table~\ref{tab:missions} lists the two GPS mission definitions currently checked in, each specified as an ordered sequence of waypoints that \texttt{MissionManager} converts to ENU (Section~\ref{sec:gps2enu}) and feeds leg-by-leg to the ILOS guidance law.
+
+\begin{table}[H]
+\centering
+\caption{Mission waypoint sets (WGS84 degrees).}
+\label{tab:missions}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Mission & Leg & Waypoints (lat, lon) \\
+\midrule
+\multirow{3}{*}{Square (FEUP)} & Deploy & (41.685117, $-8.838916$) $\to$ (41.685399, $-8.839086$) $\to$ (41.685684, $-8.838855$)\\
+ & Landing & (41.685399, $-8.839086$) \\
+ & Return & (41.685117, $-8.838916$) \\
+\midrule
+\multirow{4}{*}{Viana buoys} & Deploy & (41.684793,$-8.839555$)$\to$(41.684922,$-8.839550$)$\to$(41.685022,$-8.839395$)\\
+ & Deploy pos.\ & (41.685022, $-8.839395$)\\
+ & Landing & (41.686183, $-8.839467$) \\
+ & Return & reverse of deploy leg \\
+\bottomrule
+\end{tabular}
+\end{table}

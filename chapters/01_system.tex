@@ -1,0 +1,110 @@
+% =============================================================================
+\section{The System}
+\label{sec:system}
+% =============================================================================
+
+\textit{Lily} is a twin-thruster (differential-thrust) unmanned surface vehicle developed for autonomous survey and cooperative deploy/retrieve missions. The vehicle is controlled by a companion computer running ROS~2, bridged to a MAVLink-speaking autopilot (via \texttt{mavros}) that handles low-level attitude/position estimation, and interfaces with two brushless thrusters through VESC electronic speed controllers (ESCs) operating in Field-Oriented Control (FOC) mode.
+
+\subsection{Vehicle configuration and thruster layout}
+\label{sec:hull}
+
+The vehicle frame (\texttt{lily\_description/urdf/lily.urdf}) defines the sensor and actuator mounting points relative to \texttt{base\_link}, summarized in Table~\ref{tab:frames} and Figure~\ref{fig:layout}.
+
+\begin{table}[H]
+\centering
+\caption{Sensor and actuator mounting offsets relative to \texttt{base\_link} (URDF, meters).}
+\label{tab:frames}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+Frame & Component & $x$ [m] & $y$ [m] & $z$ [m] \\
+\midrule
+\texttt{left\_engine\_link}  & Port thruster      & $-0.80$ & $+0.33$ & $-0.15$ \\
+\texttt{right\_engine\_link} & Starboard thruster & $-0.80$ & $-0.33$ & $-0.15$ \\
+\texttt{lidar\_sensor}       & 3D LiDAR           & $+1.00$ & $0.00$  & $+0.70$ \\
+\texttt{camera\_sensor}      & Monocular camera   & $+1.20$ & $0.00$  & $+0.70$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The two thrusters are mounted symmetrically about the centerline at the stern, giving a thruster (skid-steer) baseline of
+\begin{equation}
+L \;=\; y_{\text{left}} - y_{\text{right}} \;=\; 0.33 - (-0.33) \;=\; 0.66\ \text{m},
+\end{equation}
+which is exactly the \texttt{wheel\_base} parameter ($0.66$~m) used throughout the control stack (Section~\ref{sec:vw}). \todored{Confirm overall hull length/beam/draft and dry mass -- the URDF only encodes frame offsets, not the hull geometry. The velocity-controller comment in \texttt{velocity\_controller\_real.yaml} notes an estimated mass $\approx 42$\,kg and yaw inertia $I_z \approx 26\,\text{kg}\,\text{m}^2$; confirm/replace with measured values.}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.15,>=Stealth]
+% Hull outline
+\draw[thick,fill=blue!5] (-2.2,-0.9) .. controls (-2.6,-0.3) and (-2.6,0.3) .. (-2.2,0.9)
+   -- (1.6,0.9) .. controls (2.4,0.6) and (2.4,-0.6) .. (1.6,-0.9) -- cycle;
+% Centerline
+\draw[dashed,gray] (-2.6,0) -- (2.5,0);
+% Thrusters
+\filldraw[fill=orange!40] (-2.0,0.33) circle (0.12) node[above=2pt]{\footnotesize Left thruster};
+\filldraw[fill=orange!40] (-2.0,-0.33) circle (0.12) node[below=2pt]{\footnotesize Right thruster};
+\draw[<->] (-2.0,0.5) -- (-2.0,-0.5) node[midway,right]{\footnotesize $L=0.66$~m};
+% Sensors
+\filldraw[fill=green!40] (1.0,0) circle (0.09) node[above right=1pt]{\footnotesize LiDAR};
+\filldraw[fill=cyan!40] (1.2,0.35) circle (0.08) node[above=2pt]{\footnotesize Camera};
+% Body axes at base_link (origin)
+\draw[->,thick] (0,0) -- (0.9,0) node[right]{$x_b$ (surge)};
+\draw[->,thick] (0,0) -- (0,0.7) node[above]{$y_b$ (sway)};
+\node[below left] at (0,0) {\texttt{base\_link}};
+% Force/torque arrows near stern
+\draw[->,red,thick] (-2.0,0.33) -- (-1.55,0.33);
+\draw[->,red,thick] (-2.0,-0.33) -- (-1.55,-0.33);
+\node[red] at (-1.3,0.5) {\footnotesize $T_{\text{left}}$};
+\node[red] at (-1.3,-0.5) {\footnotesize $T_{\text{right}}$};
+\end{tikzpicture}
+\caption{Top-down thruster layout. Two aft-mounted thrusters separated by $L=0.66$~m produce surge force $F_{\text{surge}}=T_{\text{left}}+T_{\text{right}}$ and yaw moment $M_{\text{yaw}}=(T_{\text{right}}-T_{\text{left}})\cdot L/2$ about \texttt{base\_link} (Section~\ref{sec:mixing}).}
+\label{fig:layout}
+\end{figure}
+
+\subsection{Compute and communications architecture}
+
+Figure~\ref{fig:arch} shows the software architecture. The companion computer runs ROS~2 nodes for guidance, control and perception; \texttt{mavros} bridges MAVLink telemetry/commands to/from the autopilot; the autopilot performs attitude and position estimation and exposes RC input, arming and mode services. In simulation, the same topic layout is reproduced by \texttt{ros\_gz\_bridge} against Gazebo (Section~\ref{sec:sim}), so the guidance/control stack is unmodified between sim and field deployment.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[>=Stealth,node distance=10mm,every node/.style={font=\footnotesize}]
+\tikzstyle{blk}=[draw,rounded corners,fill=blue!6,minimum width=3.1cm,minimum height=0.9cm,align=center]
+\node[blk] (mission) {MissionManager\\(waypoints, FSM)};
+\node[blk,below=of mission] (control) {ControlLogic\\(mode FSM + PID)};
+\node[blk,below=of control] (t2r) {MotorThrust2RPM\\(duty-cycle shaping)};
+\node[blk,below=of t2r] (vesc) {VESC driver (FOC)};
+\node[blk,right=28mm of control] (mavros) {mavros};
+\node[blk,above=of mavros] (ekf) {Autopilot: INS/EKF\\(IMU + GPS fusion)};
+\node[blk,below=of mavros] (rc) {RC receiver};
+
+\draw[->] (mission) -- node[right]{/cmd\_vel} (control);
+\draw[->] (control) -- node[right]{/left,right\_thrust} (t2r);
+\draw[->] (t2r) -- node[right]{duty\_cycle} (vesc);
+\draw[->] (ekf) -- (mavros);
+\draw[->] (mavros.west) -- node[above]{/mavros/local\_position/odom} ($(control.east)+(0,0.25)$);
+\draw[->] (mavros.west) -- node[below]{/mavros/local\_position/odom} ($(mission.east)+(0,-0.05)$);
+\draw[->] (rc) -- (mavros);
+\draw[->] (mavros) -- node[right]{/mavros/rc/in} (control.east |- rc.west);
+\end{tikzpicture}
+\caption{Software architecture. Guidance (MissionManager) and control (ControlLogic) run on the companion computer; the autopilot's onboard EKF fuses IMU and GPS and exposes a fused odometry estimate through \texttt{mavros}. RC input always has top priority in \texttt{ControlLogic}.}
+\label{fig:arch}
+\end{figure}
+
+\subsection{Localization: IMU/GPS fusion}
+\label{sec:ekf}
+
+Pose and velocity feedback used by every controller in this report (\texttt{nav\_msgs/Odometry} on \texttt{/usv/lily/mavros/local\_position/odom}) is a fused estimate produced by the autopilot's on-board Extended Kalman Filter (EKF), not by a node inside this ROS~2 workspace. The workspace only \emph{consumes} three autopilot outputs bridged by \texttt{mavros}:
+\begin{itemize}[nosep]
+    \item \texttt{/usv/lily/mavros/imu/data} (\texttt{sensor\_msgs/Imu}) -- angular rate and linear acceleration, high-rate strapdown input;
+    \item \texttt{/usv/lily/mavros/global\_position/raw/fix} (\texttt{sensor\_msgs/NavSatFix}) -- raw GPS fix;
+    \item \texttt{/usv/lily/mavros/local\_position/odom} (\texttt{nav\_msgs/Odometry}) -- the EKF's fused pose/twist output, and the only feedback signal used by \texttt{ControlLogic}, \texttt{VelocityController} and \texttt{MissionManager}.
+\end{itemize}
+A local ENU datum is established once per session: in simulation, \texttt{gps\_origin\_publisher.py} parses the \texttt{<spherical\_coordinates>} tag of the loaded world's SDF file and republishes it as a \texttt{GeoPointStamped} on the same topic name the autopilot uses for its home/origin (\texttt{.../global\_position/gp\_origin}); on the real vehicle this is set by the autopilot at arming. \texttt{MissionManager} listens for this once, then converts every mission waypoint from geodetic (lat/lon) to local ENU with a flat-Earth approximation (Section~\ref{sec:gps2enu}).
+
+The filter itself runs as autopilot firmware (ArduSub/ArduPilot-class) and is not implemented, tuned, or modified anywhere in this ROS~2 workspace -- it is treated as a black box that is simply consumed through the three topics above.
+
+\begin{center}
+\rednote{Should we dive into the EKF formulation (state vector, prediction/correction equations), or just describe that we used the ArduSub/ArduPilot on-board EKF as-is, without re-deriving it here?}
+\end{center}
+
+\todored{Confirm which autopilot firmware and EKF (e.g. ArduPilot EKF3, PX4 EKF2) Lily actually runs, and, if we do decide to elaborate, paste in the actual noise/process covariance tuning (\texttt{EK3\_*} or \texttt{EKF2\_*} parameters) so the description is vehicle-specific rather than generic.}

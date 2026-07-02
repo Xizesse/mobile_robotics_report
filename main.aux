@@ -1,0 +1,102 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}The System}{3}{section.1}\protected@file@percent }
+\newlabel{sec:system}{{1}{3}{The System}{section.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Vehicle configuration and thruster layout}{3}{subsection.1.1}\protected@file@percent }
+\newlabel{sec:hull}{{1.1}{3}{Vehicle configuration and thruster layout}{subsection.1.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Sensor and actuator mounting offsets relative to \texttt  {base\_link} (URDF, meters).}}{3}{table.caption.2}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{tab:frames}{{1}{3}{Sensor and actuator mounting offsets relative to \texttt {base\_link} (URDF, meters)}{table.caption.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Top-down thruster layout. Two aft-mounted thrusters separated by $L=0.66$~m produce surge force $F_{\text  {surge}}=T_{\text  {left}}+T_{\text  {right}}$ and yaw moment $M_{\text  {yaw}}=(T_{\text  {right}}-T_{\text  {left}})\cdot L/2$ about \texttt  {base\_link} (Section~\ref {sec:mixing}).}}{3}{figure.caption.3}\protected@file@percent }
+\newlabel{fig:layout}{{1}{3}{Top-down thruster layout. Two aft-mounted thrusters separated by $L=0.66$~m produce surge force $F_{\text {surge}}=T_{\text {left}}+T_{\text {right}}$ and yaw moment $M_{\text {yaw}}=(T_{\text {right}}-T_{\text {left}})\cdot L/2$ about \texttt {base\_link} (Section~\ref {sec:mixing})}{figure.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Compute and communications architecture}{3}{subsection.1.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Software architecture. Guidance (MissionManager) and control (ControlLogic) run on the companion computer; the autopilot's onboard EKF fuses IMU and GPS and exposes a fused odometry estimate through \texttt  {mavros}. RC input always has top priority in \texttt  {ControlLogic}.}}{4}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:arch}{{2}{4}{Software architecture. Guidance (MissionManager) and control (ControlLogic) run on the companion computer; the autopilot's onboard EKF fuses IMU and GPS and exposes a fused odometry estimate through \texttt {mavros}. RC input always has top priority in \texttt {ControlLogic}}{figure.caption.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Localization: IMU/GPS fusion}{4}{subsection.1.3}\protected@file@percent }
+\newlabel{sec:ekf}{{1.3}{4}{Localization: IMU/GPS fusion}{subsection.1.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Motor Calibration}{5}{section.2}\protected@file@percent }
+\newlabel{sec:motor}{{2}{5}{Motor Calibration}{section.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Actuation chain from commanded thrust to delivered thrust.}}{5}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:actuation}{{3}{5}{Actuation chain from commanded thrust to delivered thrust}{figure.caption.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Thrust-to-duty-cycle shaping (\texttt  {motor\_thrust2RPM})}{5}{subsection.2.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces \texttt  {motor\_thrust2RPM} parameters (identical for sim and real, \texttt  {lily\_control/cfg/*.yaml}).}}{6}{table.caption.6}\protected@file@percent }
+\newlabel{tab:t2rpm}{{2}{6}{\texttt {motor\_thrust2RPM} parameters (identical for sim and real, \texttt {lily\_control/cfg/*.yaml})}{table.caption.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}VESC configuration and FOC commutation}{6}{subsection.2.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces VESC configuration limits.}}{6}{table.caption.7}\protected@file@percent }
+\newlabel{tab:vesc}{{3}{6}{VESC configuration limits}{table.caption.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Thrust curve (ERPM $\rightarrow $ thrust)}{6}{subsection.2.3}\protected@file@percent }
+\newlabel{sec:thrustcurve}{{2.3}{6}{Thrust curve (ERPM $\rightarrow $ thrust)}{subsection.2.3}{}}
+\newlabel{eq:thrustcurve}{{8}{6}{Thrust curve (ERPM $\rightarrow $ thrust)}{equation.2.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Nominal quadratic thrust curve, Eq.~\eqref  {eq:thrustcurve}, used as the calibration reference.}}{7}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:thrustcurve}{{4}{7}{Nominal quadratic thrust curve, Eq.~\eqref {eq:thrustcurve}, used as the calibration reference}{figure.caption.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Vehicle Dynamics}{7}{section.3}\protected@file@percent }
+\newlabel{sec:dynamics}{{3}{7}{Vehicle Dynamics}{section.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}$v$/$w$ Control: Kinematics and PID Design}{7}{section.4}\protected@file@percent }
+\newlabel{sec:vw}{{4}{7}{$v$/$w$ Control: Kinematics and PID Design}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Body-frame kinematics}{7}{subsection.4.1}\protected@file@percent }
+\newlabel{eq:surgeeom}{{9}{8}{Body-frame kinematics}{equation.4.9}{}}
+\newlabel{eq:yaweom}{{10}{8}{Body-frame kinematics}{equation.4.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Thruster mixing}{8}{subsection.4.2}\protected@file@percent }
+\newlabel{sec:mixing}{{4.2}{8}{Thruster mixing}{subsection.4.2}{}}
+\newlabel{eq:mixL}{{13}{8}{Thruster mixing}{equation.4.13}{}}
+\newlabel{eq:mixR}{{14}{8}{Thruster mixing}{equation.4.14}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Decoupled surge/yaw PID}{8}{subsection.4.3}\protected@file@percent }
+\newlabel{sec:pid}{{4.3}{8}{Decoupled surge/yaw PID}{subsection.4.3}{}}
+\newlabel{eq:pidF}{{17}{8}{Decoupled surge/yaw PID}{equation.4.17}{}}
+\newlabel{eq:pidM}{{18}{8}{Decoupled surge/yaw PID}{equation.4.18}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Decoupled PID gains, integral limits and slew rate (surge $v$ and yaw $w$).}}{9}{table.caption.9}\protected@file@percent }
+\newlabel{tab:pid}{{4}{9}{Decoupled PID gains, integral limits and slew rate (surge $v$ and yaw $w$)}{table.caption.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Relay-feedback PID autotuning}{9}{subsection.4.4}\protected@file@percent }
+\newlabel{sec:autotune}{{4.4}{9}{Relay-feedback PID autotuning}{subsection.4.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Relay-autotuner tuning rules implemented in \texttt  {relay\_autotuner.py}.}}{10}{table.caption.10}\protected@file@percent }
+\newlabel{tab:tuningrules}{{5}{10}{Relay-autotuner tuning rules implemented in \texttt {relay\_autotuner.py}}{table.caption.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Mode state machine}{10}{subsection.4.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces \texttt  {ControlLogic} mode FSM. Edge-triggered RC channel thresholds ($>1600\,\mu \text  {s}$) drive transitions; only a GUIDED $\to $ MANUAL/POSITION\_HOLD/TELEOP switch from RC is a hard override that blocks MissionManager's software requests.}}{10}{figure.caption.11}\protected@file@percent }
+\newlabel{fig:fsm}{{5}{10}{\texttt {ControlLogic} mode FSM. Edge-triggered RC channel thresholds ($>1600\,\mu \text {s}$) drive transitions; only a GUIDED $\to $ MANUAL/POSITION\_HOLD/TELEOP switch from RC is a hard override that blocks MissionManager's software requests}{figure.caption.11}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Trajectory Following: Integral Line-Of-Sight (ILOS) Guidance}{10}{section.5}\protected@file@percent }
+\newlabel{sec:ilos}{{5}{10}{Trajectory Following: Integral Line-Of-Sight (ILOS) Guidance}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Path-frame errors}{10}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Lookahead point and ILOS heading law}{11}{subsection.5.2}\protected@file@percent }
+\newlabel{eq:ilosint}{{28}{11}{Lookahead point and ILOS heading law}{equation.5.28}{}}
+\newlabel{eq:ilosaug}{{29}{11}{Lookahead point and ILOS heading law}{equation.5.29}{}}
+\newlabel{eq:iloslaw}{{30}{11}{Lookahead point and ILOS heading law}{equation.5.30}{}}
+\newlabel{eq:heading_err}{{31}{11}{Lookahead point and ILOS heading law}{equation.5.31}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Speed law}{11}{subsection.5.3}\protected@file@percent }
+\newlabel{eq:align}{{33}{11}{Speed law}{equation.5.33}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces ILOS guidance geometry: cross-track error $e_y$, lookahead distance $\Delta $, lookahead point $\boldsymbol  \ell $, and desired heading $\psi _d$ toward $\boldsymbol  \ell $ (Eq.~\eqref  {eq:iloslaw}).}}{12}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:ilos}{{6}{12}{ILOS guidance geometry: cross-track error $e_y$, lookahead distance $\Delta $, lookahead point $\boldsymbol \ell $, and desired heading $\psi _d$ toward $\boldsymbol \ell $ (Eq.~\eqref {eq:iloslaw})}{figure.caption.12}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces ILOS/waypoint guidance parameters (\texttt  {lily\_nav} mission configs).}}{12}{table.caption.13}\protected@file@percent }
+\newlabel{tab:ilosparams}{{6}{12}{ILOS/waypoint guidance parameters (\texttt {lily\_nav} mission configs)}{table.caption.13}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Trajectory Generation from Waypoints: Mission Manager}{12}{section.6}\protected@file@percent }
+\newlabel{sec:mission}{{6}{12}{Trajectory Generation from Waypoints: Mission Manager}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}GPS $\to $ local ENU conversion}{12}{subsection.6.1}\protected@file@percent }
+\newlabel{sec:gps2enu}{{6.1}{12}{GPS $\to $ local ENU conversion}{subsection.6.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Mission finite-state machine}{12}{subsection.6.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces MissionManager finite-state machine: waypoints are consumed sequentially within each \texttt  {TRANSITING\_*} leg, and the FSM advances once the leg's waypoints are reached or the corresponding service is called.}}{13}{figure.caption.14}\protected@file@percent }
+\newlabel{fig:missionfsm}{{7}{13}{MissionManager finite-state machine: waypoints are consumed sequentially within each \texttt {TRANSITING\_*} leg, and the FSM advances once the leg's waypoints are reached or the corresponding service is called}{figure.caption.14}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Example missions}{13}{subsection.6.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Mission waypoint sets (WGS84 degrees).}}{13}{table.caption.15}\protected@file@percent }
+\newlabel{tab:missions}{{7}{13}{Mission waypoint sets (WGS84 degrees)}{table.caption.15}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Simulation Environment (\texttt  {lily\_gz})}{13}{section.7}\protected@file@percent }
+\newlabel{sec:sim}{{7}{13}{Simulation Environment (\texttt {lily\_gz})}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Overview}{14}{subsection.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Environmental plugins: waves and wind}{14}{subsection.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Vehicle model and worlds}{14}{subsection.7.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces {\color  {red}\textbf  {[TODO: Screenshot(s) of the Gazebo worlds used (e.g.\ \texttt  {feup}, \texttt  {viana\_buoys}), ideally showing the wave/wind effects described above.]}}}}{14}{figure.caption.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Results}{14}{section.8}\protected@file@percent }
+\newlabel{sec:results}{{8}{14}{Results}{section.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}$v$/$w$ tracking performance}{15}{subsection.8.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces {\color  {red}\textbf  {[TODO: Surge velocity step response: $v_{\text  {meas}}(t)$ vs.\ $v_{\text  {cmd}}(t)$ for a representative step (e.g.\ $0\to 0.5$~m/s). Overlay the commanded step and measured response; annotate rise time, overshoot and settling band.]}}}}{15}{figure.caption.17}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces {\color  {red}\textbf  {[TODO: Yaw-rate step response: $w_{\text  {meas}}(t)$ vs.\ $w_{\text  {cmd}}(t)$ for a representative step (e.g.\ $0\to 0.3$~rad/s).]}}}}{15}{figure.caption.18}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Velocity-tracking performance metrics (fill in from step-response logs).}}{15}{table.caption.19}\protected@file@percent }
+\newlabel{tab:vwresults}{{8}{15}{Velocity-tracking performance metrics (fill in from step-response logs)}{table.caption.19}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Trajectory-following performance}{16}{subsection.8.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces {\color  {red}\textbf  {[TODO: Executed path (ENU) vs.\ commanded waypoint path for the \{square / Viana buoys\} mission -- overlay \texttt  {mission\_path\_enu} (commanded) against the logged \texttt  {/usv/lily/mavros/local\_position/odom} trace (executed), with waypoint markers and arrival-radius circles.]}}}}{16}{figure.caption.20}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces {\color  {red}\textbf  {[TODO: Cross-track error $e_y(t)$ over the course of the mission, with the $\pm R_{\text  {wp}}$ tolerance band shown for reference.]}}}}{16}{figure.caption.21}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Trajectory-following performance metrics (fill in per mission).}}{16}{table.caption.22}\protected@file@percent }
+\newlabel{tab:ilosresults}{{9}{16}{Trajectory-following performance metrics (fill in per mission)}{table.caption.22}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Discussion}{16}{subsection.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Conclusion}{17}{section*.23}\protected@file@percent }
+\gdef \@abspage@last{17}

@@ -1,0 +1,81 @@
+\documentclass[11pt,a4paper]{article}
+
+% ---------------------------------------------------------------------------
+% Packages
+% ---------------------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2.6cm]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc,shapes.geometric,decorations.pathreplacing,fit}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black}
+\usepackage[labelfont=bf]{caption}
+
+% ---------------------------------------------------------------------------
+% TODO / placeholder / review-note helpers
+% ---------------------------------------------------------------------------
+\newcommand{\todored}[1]{{\color{red}\textbf{[TODO: #1]}}}
+\newcommand{\tbd}{{\color{red}\textbf{TBD}}}
+% Generic red review note, not tied to a person
+\newcommand{\rednote}[1]{{\color{red}\textbf{[NOTE: #1]}}}
+% Red note addressed to a specific collaborator, e.g. \noteto{Tiago}{please check this}
+\newcommand{\noteto}[2]{{\color{red}\textbf{[Note for #1: #2]}}}
+
+\newcommand{\placeholderfig}[3]{%
+% #1 width, #2 height (cm), #3 caption text describing what to insert
+\begin{figure}[H]
+\centering
+\pgfmathsetmacro{\phw}{#1}
+\pgfmathsetmacro{\phh}{#2}
+\pgfmathsetmacro{\phtw}{#1-1}
+\begin{tikzpicture}
+\definecolor{phbg}{RGB}{250,240,240}
+\draw[fill=phbg,draw=red!70!black,thick] (0,0) rectangle (\phw,\phh);
+\draw[red!70!black,thick] (0,0) -- (\phw,\phh);
+\draw[red!70!black,thick] (0,\phh) -- (\phw,0);
+\node[align=center,text width=\phtw cm,text=red!70!black] at (\phw/2,\phh/2) {\small\textbf{PLACEHOLDER}\\[2pt]\footnotesize #3};
+\end{tikzpicture}
+\caption{\todored{#3}}
+\end{figure}%
+}
+
+% ---------------------------------------------------------------------------
+\title{\textbf{Lily}: System Design, Guidance and Control of an\\ Autonomous Surface Vehicle}
+\author{Francisco \\ \todored{Course name, institution and instructor -- fill in}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This report documents the system architecture, actuation calibration, control, guidance and simulation stack developed for \textit{Lily}, a differential-thrust Autonomous Surface Vehicle (ASV). We describe the vehicle's physical configuration and state estimation pipeline, the in-water calibration of the propulsion system, the decoupled surge/yaw PID velocity controller and its thruster mixing, an Integral Line-Of-Sight (ILOS) trajectory-following law, the GPS-waypoint mission-management layer, and the Gazebo-based digital twin used for development and validation. Experimental results for velocity tracking and trajectory-following performance are reported in Section~\ref{sec:results}. \todored{Add one or two sentences to the abstract once the Results section is filled in with real numbers.}
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\input{chapters/01_system}
+\input{chapters/02_motor_calibration}
+\input{chapters/03_dynamics}
+\input{chapters/04_vw_control}
+\input{chapters/05_ilos}
+\input{chapters/06_mission}
+\input{chapters/07_simulation}
+\input{chapters/08_results}
+\input{chapters/09_conclusion}
+
+\end{document}

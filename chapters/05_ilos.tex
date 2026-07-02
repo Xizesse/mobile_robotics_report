@@ -1,0 +1,99 @@
+% =============================================================================
+\section{Trajectory Following: Integral Line-Of-Sight (ILOS) Guidance}
+\label{sec:ilos}
+% =============================================================================
+
+\begin{center}
+\noteto{Francisco}{Please look into this section and add supporting pictures (e.g.\ logged path vs.\ ILOS guidance geometry overlay, real cross-track error traces) wherever useful.}
+\end{center}
+
+\subsection{Path-frame errors}
+
+Given the current path leg from waypoint $\mathbf{p}=(p_x,p_y)$ to the next waypoint $\mathbf{t}=(t_x,t_y)$, the path-tangential angle is
+\begin{equation}
+\alpha_k = \operatorname{atan2}(t_y - p_y,\; t_x - p_x).
+\end{equation}
+Rotating the vehicle's position $\mathbf{c}=(c_x,c_y)$ relative to $\mathbf{p}$ into the path frame gives the along-track error $e_x$ (used for the lookahead point) and the cross-track error $e_y$ (the signed perpendicular distance to the path, positive to the left):
+\begin{align}
+e_x &= \cos\alpha_k\,(c_x-p_x) + \sin\alpha_k\,(c_y-p_y), \\
+e_y &= -\sin\alpha_k\,(c_x-p_x) + \cos\alpha_k\,(c_y-p_y).
+\end{align}
+
+\subsection{Lookahead point and ILOS heading law}
+
+A lookahead point is placed a fixed distance $\Delta$ (\texttt{lookahead\_distance}) ahead of the vehicle's along-track projection, clipped so it never overshoots the target waypoint:
+\begin{equation}
+s = \min\!\big(e_x + \Delta,\ \|\mathbf{t}-\mathbf{p}\|\big), \qquad \mathbf{\ell} = \mathbf{p} + s\,(\cos\alpha_k,\sin\alpha_k).
+\end{equation}
+Pure (proportional) LOS would steer the bow toward $\boldsymbol\ell$ using $\psi_d = \alpha_k + \arctan(-e_y/\Delta)$; this drives $e_y\to 0$ only in the absence of a constant disturbance (current, wind). To reject a constant environmental disturbance with zero steady-state cross-track error, an \emph{integral} term is added on the cross-track error (Integral-LOS, following Fossen \& Pettersen):
+\begin{align}
+\dot I_y &= e_y, \qquad I_y \leftarrow \operatorname{clamp}(I_y,\, -I_{y,\max},\, I_{y,\max}), \label{eq:ilosint}\\
+\tilde e_y &= e_y + k_i\, I_y, \label{eq:ilosaug}\\
+\psi_d &= \alpha_k + \arctan\!\left(\frac{-\tilde e_y}{\Delta_{\text{eff}}}\right), \qquad \Delta_{\text{eff}} = \max\big(0.1,\ \|\boldsymbol\ell - \mathbf{c}\|\big), \label{eq:iloslaw}\\
+\psi_e &= \operatorname{wrap}_{(-\pi,\pi]}(\psi_d - \psi), \label{eq:heading_err}
+\end{align}
+where $k_i=$\texttt{ki\_los}, $I_{y,\max}=$\texttt{max\_integral\_e\_y}, and $\psi$ is the vehicle's current yaw. In the deployed mission configurations $k_i=0$ (Table~\ref{tab:ilosparams}), i.e. the integral action is wired in and available but currently disabled -- pure LOS is being used operationally. \todored{Decide whether to enable $k_i>0$ for missions with strong current/wind, and report the cross-track error improvement if you do.}
+
+\subsection{Speed law}
+
+Forward speed is commanded proportional to remaining distance, but is weighted down whenever the vehicle is not pointed at the lookahead point -- this is what prevents the ASV from surging sideways while turning onto a new leg -- and is decelerated inside an arrival radius so that the vehicle settles rather than overshoots each waypoint:
+\begin{align}
+d_{\text{tgt}} &= \|\mathbf{t}-\mathbf{c}\|, \\
+\text{align} &= \begin{cases} \big(\max(0,\cos\psi_e)\big)^{n} & |\psi_e| < \psi_{\text{thr}} \\ 0 & \text{otherwise} \end{cases}, \qquad n = \texttt{align\_exponent}, \label{eq:align}\\
+v_{\text{allow}} &= \begin{cases} \max\!\big(0.1,\ v_{\max}\, d_{\text{tgt}}/R_{\text{arr}}\big) & d_{\text{tgt}} < R_{\text{arr}} \\ v_{\max} & \text{otherwise} \end{cases}, \\
+v_{\text{cmd}} &= \operatorname{clamp}\!\big(k_{p,\text{lin}}\, d_{\text{tgt}}\cdot\text{align},\ 0,\ v_{\text{allow}}\big), \\
+w_{\text{cmd}} &= \operatorname{clamp}\!\big(k_{p,\text{ang}}\, \psi_e,\ -w_{\max},\ w_{\max}\big).
+\end{align}
+The waypoint is declared reached once $d_{\text{tgt}} < R_{\text{wp}}$ (\texttt{waypoint\_radius}), at which point the ILOS integrator is reset and the leg advances to the next waypoint pair.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[>=Stealth,scale=1.05]
+\coordinate (p) at (0,0);
+\coordinate (t) at (6,1.2);
+\draw[thick,blue] (p) -- (t) node[midway,above,sloped]{\footnotesize path leg};
+\filldraw (p) circle(2pt) node[below]{\footnotesize $\mathbf{p}$};
+\filldraw (t) circle(2pt) node[right]{\footnotesize $\mathbf{t}$};
+\coordinate (c) at (2.3,-0.9);
+\filldraw[red] (c) circle(2pt) node[below]{\footnotesize $\mathbf{c}$ (vehicle)};
+% projection foot
+\coordinate (foot) at (2.3,0.46);
+\draw[dashed,gray] (c) -- (foot);
+\node[gray] at (1.65,-0.28) {\footnotesize $e_y$};
+% lookahead point
+\coordinate (l) at (3.8,0.76);
+\filldraw[green!50!black] (l) circle(2pt) node[above]{\footnotesize $\boldsymbol\ell$};
+\draw[green!50!black,->] (c) -- (l);
+\draw[<->,dashed] (foot) -- (l) node[midway,above]{\footnotesize $\Delta$};
+% heading
+\draw[->,thick,red] (c) -- ++(1.1,0.55) node[right]{\footnotesize $\psi$ (heading)};
+\end{tikzpicture}
+\caption{ILOS guidance geometry: cross-track error $e_y$, lookahead distance $\Delta$, lookahead point $\boldsymbol\ell$, and desired heading $\psi_d$ toward $\boldsymbol\ell$ (Eq.~\eqref{eq:iloslaw}).}
+\label{fig:ilos}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{ILOS/waypoint guidance parameters (\texttt{lily\_nav} mission configs).}
+\label{tab:ilosparams}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Parameter & Square mission & Viana buoys mission & Meaning\\
+\midrule
+$k_{p,\text{lin}}$ & 0.5 & 0.5 & Linear gain [1/s]\\
+$k_{p,\text{ang}}$ & 1.5 & 1.5 & Angular gain [1/s]\\
+$v_{\max}$ & 1.0 m/s & 0.5 m/s & Max commanded surge \\
+$w_{\max}$ & 0.5 rad/s & 0.5 rad/s & Max commanded yaw rate\\
+$R_{\text{wp}}$ (\texttt{waypoint\_radius}) & 3.0 m & 3.0 m & Waypoint arrival tolerance\\
+$R_{\text{arr}}$ (\texttt{arrival\_radius}) & 5.0 m & 5.0 m & Deceleration radius\\
+$n$ (\texttt{align\_exponent}) & 2.0 & 2.0 & Heading-alignment sharpness\\
+$\psi_{\text{thr}}$ & $28.6^\circ$ & $28.6^\circ$ & Max heading err.\ for forward motion\\
+$\Delta$ (\texttt{lookahead\_distance}) & 3.0 m & 3.0 m & ILOS lookahead \\
+$k_i$ (\texttt{ki\_los}) & 0.0 & 0.0 & Integral gain (disabled)\\
+$I_{y,\max}$ & 5.0 & 20.0 & Integral clamp \\
+Guidance loop rate & 10 Hz & 10 Hz & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\todored{A simpler bearing-only \texttt{WaypointController} (proportional heading law, no lookahead/integral term) also exists in the codebase as a baseline; MissionManager currently instantiates only the ILOS \texttt{LosController}. Mention in the report if the baseline was used for any A/B comparison.}
