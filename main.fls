@@ -366,7 +366,11 @@ INPUT ./figures/esquema.drawio.png
 INPUT ./figures/esquema.drawio.png
 INPUT ./figures/esquema.drawio.png
 INPUT ./figures/esquema.drawio.png
-INPUT /usr/share/texmf/fonts/tfm/public/lm/ec-lmr9.tfm
+INPUT ./figures/esquema2.drawio.png
+INPUT ./figures/esquema2.drawio.png
+INPUT ./figures/esquema2.drawio.png
+INPUT ./figures/esquema2.drawio.png
+INPUT ./figures/esquema2.drawio.png
 INPUT /usr/share/texmf/tex/latex/lm/ts1lmr.fd
 INPUT /usr/share/texmf/tex/latex/lm/ts1lmr.fd
 INPUT /usr/share/texmf/tex/latex/lm/ts1lmr.fd
@@ -376,6 +380,7 @@ INPUT ./chapters/02_motor_calibration.tex
 INPUT ./chapters/02_motor_calibration.tex
 INPUT ./chapters/02_motor_calibration.tex
 INPUT chapters/02_motor_calibration.tex
+INPUT /usr/share/texmf/fonts/tfm/public/lm/ec-lmr9.tfm
 INPUT /usr/share/texmf/fonts/tfm/public/lm/rm-lmr9.tfm
 INPUT /usr/share/texmf/fonts/tfm/public/lm/rm-lmr5.tfm
 INPUT /usr/share/texmf/fonts/tfm/public/lm/lmmi9.tfm

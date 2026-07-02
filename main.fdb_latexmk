@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1783004016.80567 "/home/motustiago/Documents/mobile_robotics_report/main.tex" "main.pdf" "main" 1783004018.02557 0
+["pdflatex"] 1783005177.8884 "/home/motustiago/Documents/mobile_robotics_report/main.tex" "main.pdf" "main" 1783005179.03727 0
   "/etc/texmf/web2c/texmf.cnf" 1782999550.75123 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/motustiago/Documents/mobile_robotics_report/main.tex" 1782999042.39143 3474 0d548956417cf614ffa55748f68ed2e7 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -244,7 +244,7 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1782999575.20028 5472669 54eaf61a88b6b7896ebd0dac973cb29c ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1782999678 8214794 b93199ae037246dccdff94edfd0f448e ""
-  "chapters/01_system.tex" 1783004016.57812 6725 83c8a4ee01d5b7dc08e462293b6ad78b ""
+  "chapters/01_system.tex" 1783005177.24288 5476 b1a5bfce8be11b323d6f24e1f0d92860 ""
   "chapters/02_motor_calibration.tex" 1783003669.32044 6058 9b3c5cde089451b31eec0089b137fb9a ""
   "chapters/03_dynamics.tex" 1782999042.38941 1443 aaab1ac8f97762738f197ee0a2cbf258 ""
   "chapters/04_vw_control.tex" 1782999042.38941 10823 3109c1c6a4fcb24964bccda0cf42dbf2 ""
@@ -255,10 +255,11 @@
   "chapters/09_conclusion.tex" 1782999042.38941 876 f163ea7387fe51cfcea6fcf111c6b10c ""
   "figures/bright_photo.jpg" 1783002822.2152 12550090 b1d2e0ae9c382923917dd079cac5c4bf ""
   "figures/esquema.drawio.png" 1783003894.6936 24661 58b9c977a223310a50282d897cdb79de ""
-  "main.aux" 1783004017.90482 14117 3f4cd3ba92126ed09137fc85f719daba "pdflatex"
-  "main.out" 1783004017.90582 5909 89abbba4bbfd0798458b755d9c0a14b0 "pdflatex"
+  "figures/esquema2.drawio.png" 1783005090.93445 49483 7a6cb1a4d8931ce69ef7303390720694 ""
+  "main.aux" 1783005178.91693 13880 6060656b2a52c63de71dc4c0a6135186 "pdflatex"
+  "main.out" 1783005178.91793 5909 89abbba4bbfd0798458b755d9c0a14b0 "pdflatex"
   "main.tex" 1782999042.39143 3474 0d548956417cf614ffa55748f68ed2e7 ""
-  "main.toc" 1783004017.90611 2813 1b8428395954f47e49259d71865b1221 "pdflatex"
+  "main.toc" 1783005178.9192 2813 1b8428395954f47e49259d71865b1221 "pdflatex"
   (generated)
   "main.aux"
   "main.log"

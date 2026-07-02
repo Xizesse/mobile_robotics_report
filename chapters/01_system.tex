@@ -42,6 +42,8 @@ which is exactly the \texttt{wheel\_base} parameter ($0.66$~m) used throughout t
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.7\textwidth]{figures/esquema.drawio.png}
+\caption{Vehicle layout and sensor/actuator mounting points.}
+\label{fig:layout}
 \end{figure}
 
 \subsection{Compute and communications architecture}
@@ -50,26 +52,8 @@ Figure~\ref{fig:arch} shows the software architecture. The companion computer ru
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[>=Stealth,node distance=10mm,every node/.style={font=\footnotesize}]
-\tikzstyle{blk}=[draw,rounded corners,fill=blue!6,minimum width=3.1cm,minimum height=0.9cm,align=center]
-\node[blk] (mission) {MissionManager\\(waypoints, FSM)};
-\node[blk,below=of mission] (control) {ControlLogic\\(mode FSM + PID)};
-\node[blk,below=of control] (t2r) {MotorThrust2RPM\\(duty-cycle shaping)};
-\node[blk,below=of t2r] (vesc) {VESC driver (FOC)};
-\node[blk,right=28mm of control] (mavros) {mavros};
-\node[blk,above=of mavros] (ekf) {Autopilot: INS/EKF\\(IMU + GPS fusion)};
-\node[blk,below=of mavros] (rc) {RC receiver};
-
-\draw[->] (mission) -- node[right]{/cmd\_vel} (control);
-\draw[->] (control) -- node[right]{/left,right\_thrust} (t2r);
-\draw[->] (t2r) -- node[right]{duty\_cycle} (vesc);
-\draw[->] (ekf) -- (mavros);
-\draw[->] (mavros.west) -- node[above]{/mavros/local\_position/odom} ($(control.east)+(0,0.25)$);
-\draw[->] (mavros.west) -- node[below]{/mavros/local\_position/odom} ($(mission.east)+(0,-0.05)$);
-\draw[->] (rc) -- (mavros);
-\draw[->] (mavros) -- node[right]{/mavros/rc/in} (control.east |- rc.west);
-\end{tikzpicture}
-\caption{Software architecture. Guidance (MissionManager) and control (ControlLogic) run on the companion computer; the autopilot's onboard EKF fuses IMU and GPS and exposes a fused odometry estimate through \texttt{mavros}. RC input always has top priority in \texttt{ControlLogic}.}
+\includegraphics[width=0.7\textwidth]{figures/esquema2.drawio.png}
+\caption{Software architecture.}
 \label{fig:arch}
 \end{figure}
 
