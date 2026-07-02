@@ -1,11 +1,10 @@
 \contentsline {section}{\numberline {1}The System}{3}{section.1}%
 \contentsline {subsection}{\numberline {1.1}Vehicle configuration and thruster layout}{3}{subsection.1.1}%
-\contentsline {subsection}{\numberline {1.2}Compute and communications architecture}{3}{subsection.1.2}%
-\contentsline {subsection}{\numberline {1.3}Localization: IMU/GPS fusion}{4}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.2}Compute and communications architecture}{4}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Localization and State Estimation}{4}{subsection.1.3}%
 \contentsline {section}{\numberline {2}Motor Calibration}{5}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Thrust-to-duty-cycle shaping (\texttt {motor\_thrust2RPM})}{5}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}VESC configuration and FOC commutation}{6}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Thrust curve (ERPM $\rightarrow $ thrust)}{6}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.2}Thrust curve (ERPM $\rightarrow $ thrust)}{6}{subsection.2.2}%
 \contentsline {section}{\numberline {3}Vehicle Dynamics}{7}{section.3}%
 \contentsline {section}{\numberline {4}$v$/$w$ Control: Kinematics and PID Design}{7}{section.4}%
 \contentsline {subsection}{\numberline {4.1}Body-frame kinematics}{7}{subsection.4.1}%

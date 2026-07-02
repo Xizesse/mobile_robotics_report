@@ -7,19 +7,28 @@
 \noteto{Tiago}{Please review this whole motor calibration section -- check whether the description of the thrust-shaping, dead-band, ramp and FOC logic below is still accurate and consistent with the current code (\texttt{motor\_thrust2RPM}, VESC configs), and flag anything we should add, correct, or cut before this goes in the report.}
 \end{center}
 
-Thrust commands travel through three stages before becoming water flow, as sketched in Figure~\ref{fig:actuation}: (i)~\texttt{ControlLogic}/\texttt{VelocityController} compute a desired thrust in Newtons per side; (ii)~\texttt{motor\_thrust2RPM} converts that thrust command into a bounded, rate-limited ESC duty cycle; (iii)~the VESC driver forwards the duty cycle to the ESC, which runs closed-loop FOC commutation on the BLDC thruster motor.
+Thrust commands travel through three stages before becoming water flow, as sketched in Figure~\ref{fig:actuation}: (i) the velocity control computes a desired thrust in Newtons per side; (ii) the \texttt{motor\_thrust2RPM} logic converts that thrust command into a bounded, rate-limited ESC duty cycle; (iii) the VESC driver forwards the duty cycle to the ESC, which runs closed-loop FOC commutation on the thruster motors.
+
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[>=Stealth,node distance=6mm,every node/.style={font=\footnotesize}]
-\tikzstyle{blk}=[draw,rounded corners,fill=orange!8,minimum width=3.0cm,minimum height=1.0cm,align=center]
-\node[blk] (a) {Thrust command\\$T$ [N]};
-\node[blk,right=16mm of a] (b) {motor\_thrust2RPM\\dead-band + ramp};
-\node[blk,right=16mm of b] (c) {Duty cycle\\$[-0.9,\,0.9]$};
-\node[blk,right=16mm of c] (d) {VESC (FOC)\\ERPM control};
-\node[blk,right=16mm of d] (e) {Thruster\\thrust $T$ [N]};
-\draw[->] (a)--(b); \draw[->] (b)--(c); \draw[->] (c)--(d); \draw[->] (d)--(e);
-\end{tikzpicture}
+% \textwidth forces it to match your page margins exactly
+\resizebox{\textwidth}{!}{
+    \begin{tikzpicture}[>=Stealth,node distance=6mm,every node/.style={font=\footnotesize}]
+    \tikzstyle{blk}=[draw,rounded corners,fill=orange!8,minimum width=3.0cm,minimum height=1.0cm,align=center]
+    
+    \node[blk] (a) {Thrust command\\$T$ [N]};
+    \node[blk,right=16mm of a] (b) {motor\_thrust2RPM\\dead-band + ramp};
+    \node[blk,right=16mm of b] (c) {Duty cycle\\$[-0.9,\,0.9]$};
+    \node[blk,right=16mm of c] (d) {VESC (FOC)\\ERPM control};
+    \node[blk,right=16mm of d] (e) {Thruster\\thrust $T$ [N]};
+    
+    \draw[->] (a)--(b); 
+    \draw[->] (b)--(c); 
+    \draw[->] (c)--(d); 
+    \draw[->] (d)--(e);
+    \end{tikzpicture}
+}
 \caption{Actuation chain from commanded thrust to delivered thrust.}
 \label{fig:actuation}
 \end{figure}
@@ -27,6 +36,7 @@ Thrust commands travel through three stages before becoming water flow, as sketc
 \subsection{Thrust-to-duty-cycle shaping (\texttt{motor\_thrust2RPM})}
 
 The node first normalizes the requested thrust by the configured \texttt{max\_thrust}:
+
 \begin{equation}
 d_{\text{target}} = \frac{T_{\text{cmd}}}{T_{\max}}, \qquad d_{\text{target}} \in [-1,1].
 \end{equation}
@@ -34,14 +44,18 @@ A dead-band suppresses commands too small to overcome static friction/cogging:
 \begin{equation}
 d_{\text{target}} = 0 \quad \text{if} \quad |d_{\text{target}}| < d_{\text{base}}, \qquad d_{\text{base}} = 0.08.
 \end{equation}
-The duty cycle is then rate-limited so the propeller never receives a step input. Three ramp modes are implemented; the deployed configuration uses \textbf{mode 2 (quadratic ease-out)}, in which the allowed rate of change grows quadratically with the remaining error, giving a soft start and a snappy finish:
+
+The duty cycle is then rate-limited so the propeller never receives a step input.
+A ramp mode was used in which the allowed rate of change grows quadratically with the remaining error, giving a soft start and a snappy finish:
+
 \begin{align}
 e_{\text{ramp}} &= \frac{|d_{\text{target}} - d_{\text{last}}|}{d_{\max}}, \quad \text{clamped to } [0,1] \\
 \dot d_{\text{allowed}} &= \underbrace{0.2\, \dot d_{\max}}_{\text{base rate}} \;+\; \underbrace{20\, \dot d_{\max}}_{\text{explosive rate}} \cdot e_{\text{ramp}}^2, \\
 \Delta d_{\max} &= \dot d_{\text{allowed}} \cdot \Delta t, \\
 d_{\text{last}} &\leftarrow d_{\text{last}} + \operatorname{clamp}(d_{\text{target}}-d_{\text{last}},\,-\Delta d_{\max},\,\Delta d_{\max}),
 \end{align}
-where $\dot d_{\max}=$ \texttt{max\_duty\_cycle\_rate} $=0.9\,\text{s}^{-1}$. A zero-crossing (sign reversal of the command) triggers an instantaneous stop-before-reverse when \texttt{instant\_deceleration=true}, modeling the fact that water drag decelerates the hull quickly compared to thruster spin-up; same-direction deceleration is smoothed if \texttt{smooth\_same\_dir\_decel=true}. The result is clipped to $d\in[d_{\min},d_{\max}]=[-0.9,\,0.9]$ before being published as the duty-cycle command.
+
+where $\dot d_{\max}=$ \texttt{max\_duty\_cycle\_rate} $=0.9\,\text{s}^{-1}$. A zero-crossing (sign reversal of the command) triggers an instantaneous stop-before-reverse modeling the fact that water drag decelerates the hull quickly compared to thruster spin-up; same-direction deceleration is smoothed. The result is clipped to $d\in[d_{\min},d_{\max}]=[-0.9,\,0.9]$ before being published as the duty-cycle command.
 
 \begin{table}[H]
 \centering
@@ -53,39 +67,14 @@ Parameter & Value & Meaning \\
 \midrule
 \texttt{max\_duty\_cycle} / \texttt{min\_duty\_cycle} & $\pm 0.9$ & Saturation limits \\
 \texttt{max\_duty\_cycle\_rate} & $0.9\,\text{s}^{-1}$ & Max slew of duty cycle \\
-\texttt{ramp\_mode} & 2 (quadratic) & 0 none / 1 linear / 2 quadratic ease-out \\
+\texttt{ramp\_mode} & quadratic & Quadratic acceleration to avoid instant torque \\
 \texttt{base\_duty\_cycle} & 0.08 & Static-friction dead-band \\
-\texttt{startup\_thresh} & 0.10 & Reduced accel. below this target (mode 1) \\
 \texttt{instant\_deceleration} & true & Snap to zero on direction reversal \\
 \texttt{smooth\_same\_dir\_decel} & true & Ramp (not snap) when slowing without reversing \\
 \texttt{loop\_rate} & 50\,Hz & Node update rate \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-\subsection{VESC configuration and FOC commutation}
-
-The duty-cycle command is sent over a serial link (\texttt{transport\_drivers/serial\_driver}) to a VESC-based ESC running in Field-Oriented Control mode. Table~\ref{tab:vesc} lists the deployed limits (\texttt{vesc/vesc\_driver/params/vesc\_config.yaml}).
-
-\begin{table}[H]
-\centering
-\caption{VESC configuration limits.}
-\label{tab:vesc}
-\begin{tabular}{@{}lc@{}}
-\toprule
-Parameter & Value \\
-\midrule
-Serial port & \texttt{/dev/ttyACM0} \\
-Duty cycle range & $[-1.0,\,1.0]$ (driver clamps to $\pm0.9$ upstream) \\
-Motor current limit & $[0,\,100]$\,A \\
-Speed limit (ERPM) & $\pm 23250$ \\
-Brake current range & $[-20000,\,200000]$ \\
-Servo output range & $[0.15,\,0.85]$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-FOC commutation requires an in-water motor detection/calibration pass so that winding resistance, inductance and flux-linkage (and, if used, encoder/Hall offset) are identified under realistic load -- a submerged propeller presents a very different load curve than the motor spinning in air. 
 
 \subsection{Thrust curve (ERPM $\rightarrow$ thrust)}
 \label{sec:thrustcurve}
@@ -95,7 +84,7 @@ The relationship between commanded electrical RPM (ERPM) and delivered thrust is
 T(\text{erpm}) \;=\; T_{\max}\left(\frac{\text{erpm}}{\text{erpm}_{\max}}\right)^{2},
 \label{eq:thrustcurve}
 \end{equation}
-with the reference values used to generate the calibration table (\texttt{vesc\_driver/scripts/motor\_curve.py}): $\text{erpm}_{\max}=23300$ (matching the VESC \texttt{speed\_max}$\,\approx 23250$ configured above) and $T_{\max}=200\,\text{N}$. This curve is what the FOC controller's closed-loop speed regulation and the thrust$\to$duty-cycle node above are calibrated against.
+with the reference values used to generate the calibration table: $\text{erpm}_{\max}=23300$ (matching the VESC \texttt{speed\_max}$\,\approx 23250$ configured above) and $T_{\max}=200\,\text{N}$. This curve is what the FOC controller's closed-loop speed regulation and the thrust$\to$duty-cycle node above are calibrated against.
 
 \begin{figure}[H]
 \centering

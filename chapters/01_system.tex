@@ -5,6 +5,13 @@
 
 \textit{Lily} is a twin-thruster (differential-thrust) unmanned surface vehicle developed for autonomous survey and cooperative deploy/retrieve missions. The vehicle is controlled by a companion computer running ROS~2, bridged to a MAVLink autopilot (via \texttt{mavros}) that handles low-level attitude/position estimation, and interfaces with two brushless thrusters through VESC electronic speed controllers (ESCs) operating in Field-Oriented Control (FOC) mode.
 
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=\textwidth]{figures/bright_photo.jpg}
+    \caption{The Lily USV, a twin-thruster autonomous surface vehicle.}
+    \label{fig:lily}
+\end{figure}
+
 \subsection{Vehicle configuration and thruster layout}
 \label{sec:hull}
 
@@ -34,31 +41,7 @@ which is exactly the \texttt{wheel\_base} parameter ($0.66$~m) used throughout t
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[scale=1.15,>=Stealth]
-% Hull outline
-\draw[thick,fill=blue!5] (-2.2,-0.9) .. controls (-2.6,-0.3) and (-2.6,0.3) .. (-2.2,0.9)
-   -- (1.6,0.9) .. controls (2.4,0.6) and (2.4,-0.6) .. (1.6,-0.9) -- cycle;
-% Centerline
-\draw[dashed,gray] (-2.6,0) -- (2.5,0);
-% Thrusters
-\filldraw[fill=orange!40] (-2.0,0.33) circle (0.12) node[above=2pt]{\footnotesize Left thruster};
-\filldraw[fill=orange!40] (-2.0,-0.33) circle (0.12) node[below=2pt]{\footnotesize Right thruster};
-\draw[<->] (-2.0,0.5) -- (-2.0,-0.5) node[midway,right]{\footnotesize $L=0.66$~m};
-% Sensors
-\filldraw[fill=green!40] (1.0,0) circle (0.09) node[above right=1pt]{\footnotesize LiDAR};
-\filldraw[fill=cyan!40] (1.2,0.35) circle (0.08) node[above=2pt]{\footnotesize Camera};
-% Body axes at base_link (origin)
-\draw[->,thick] (0,0) -- (0.9,0) node[right]{$x_b$ (surge)};
-\draw[->,thick] (0,0) -- (0,0.7) node[above]{$y_b$ (sway)};
-\node[below left] at (0,0) {\texttt{base\_link}};
-% Force/torque arrows near stern
-\draw[->,red,thick] (-2.0,0.33) -- (-1.55,0.33);
-\draw[->,red,thick] (-2.0,-0.33) -- (-1.55,-0.33);
-\node[red] at (-1.3,0.5) {\footnotesize $T_{\text{left}}$};
-\node[red] at (-1.3,-0.5) {\footnotesize $T_{\text{right}}$};
-\end{tikzpicture}
-\caption{Top-down thruster layout. Two aft-mounted thrusters separated by $L=0.66$~m produce surge force $F_{\text{surge}}=T_{\text{left}}+T_{\text{right}}$ and yaw moment $M_{\text{yaw}}=(T_{\text{right}}-T_{\text{left}})\cdot L/2$ about \texttt{base\_link} (Section~\ref{sec:mixing}).}
-\label{fig:layout}
+\includegraphics[width=0.7\textwidth]{figures/esquema.drawio.png}
 \end{figure}
 
 \subsection{Compute and communications architecture}

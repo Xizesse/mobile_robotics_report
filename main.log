@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.6.22)  2 JUL 2026 13:16
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.7.2)  2 JUL 2026 15:53
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**/home/motusxico/Desktop/LateX/rob_movel_report/main.tex
-(/home/motusxico/Desktop/LateX/rob_movel_report/main.tex
+**/home/motustiago/Documents/mobile_robotics_report/main.tex
+(/home/motustiago/Documents/mobile_robotics_report/main.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
@@ -722,74 +722,64 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 6.
  (/usr/share/texmf/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [1
-
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathit.enc}]
-LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10.95> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 24.
 )
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10.95> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 23.
+ [1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathit.enc}])
 \tf@toc=\write5
 \openout5 = `main.toc'.
 
  [2] (./chapters/01_system.tex
-Overfull \hbox (6.33076pt too wide) in paragraph at lines 11--12
-\T1/lmr/m/n/10.95 The ve-hi-cle frame (\T1/lmtt/m/n/10.95 lily_description/urdf/lily.urdf\T1/lmr/m/n/10.95 ) de-fines the sen-sor and ac-tu-a-tor mount-
- []
+<figures/bright_photo.jpg, id=184, 5588.88pt x 3725.92pt>
+File: figures/bright_photo.jpg Graphic file (type jpg)
+<use figures/bright_photo.jpg>
+Package pdftex.def Info: figures/bright_photo.jpg  used on input line 10.
+(pdftex.def)             Requested size: 449.55322pt x 299.67157pt.
 
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <9> on input line 46.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 46.
-[3{/usr/share/texmf/fonts/enc/dvips/lm/lm-rm.enc}]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 98.
+
+LaTeX Warning: Reference `fig:layout' on page 3 undefined on input line 18.
+
+[3{/usr/share/texmf/fonts/enc/dvips/lm/lm-rm.enc} <./figures/bright_photo.jpg>]
+<figures/esquema.drawio.png, id=196, 441.65pt x 177.66376pt>
+File: figures/esquema.drawio.png Graphic file (type png)
+<use figures/esquema.drawio.png>
+Package pdftex.def Info: figures/esquema.drawio.png  used on input line 44.
+(pdftex.def)             Requested size: 314.68588pt x 126.59486pt.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 83.
  (/usr/share/texmf/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-Overfull \hbox (31.48618pt too wide) in paragraph at lines 100--101
-[]\T1/lmtt/m/n/10.95 /usv/lily/mavros/local_position/odom \T1/lmr/m/n/10.95 (\T1/lmtt/m/n/10.95 nav_msgs/Odometry\T1/lmr/m/n/10.95 ) -- the EKF's fused pose/twist
- []
-
-) (./chapters/02_motor_calibration.tex [4{/usr/share/texmf/fonts/enc/dvips/lm/lm-ts1.enc}]
-Overfull \hbox (165.32956pt too wide) in paragraph at lines 22--23
- [][] 
- []
-
+) [4 <./figures/esquema.drawio.png>]) (./chapters/02_motor_calibration.tex
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <9> on input line 31.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 31.
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 27.
-
-Underfull \hbox (badness 10000) in paragraph at lines 48--48
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 36.
+ [5{/usr/share/texmf/fonts/enc/dvips/lm/lm-ts1.enc}]
+Underfull \hbox (badness 10000) in paragraph at lines 62--62
 []\T1/lmr/bx/n/10.95 Table 2: |\T1/lmtt/m/n/10.95 motor_thrust2RPM \T1/lmr/m/n/10.95 pa-ram-e-ters (iden-ti-cal for sim and real,
  []
 
 
-Overfull \hbox (47.91142pt too wide) in paragraph at lines 50--64
+Overfull \hbox (30.26953pt too wide) in paragraph at lines 64--77
  [][] 
  []
 
-[5{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathex.enc}]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 90.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\rightarrow' on input line 90.
+(hyperref)                removing `math shift' on input line 79.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 90.
+(hyperref)                removing `\rightarrow' on input line 79.
 
 
-Overfull \hbox (50.92285pt too wide) in paragraph at lines 97--99
-\T1/lmr/m/n/10.95 with the ref-er-ence val-ues used to gen-er-ate the cal-i-bra-tion ta-ble (\T1/lmtt/m/n/10.95 vesc_driver/scripts/motor_curve.py\T1/lmr/m/n/10.95 ):
- []
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 79.
 
-
-Overfull \hbox (8.78433pt too wide) in paragraph at lines 97--99
-\OT1/lmr/m/n/10.95 200 []$\T1/lmr/m/n/10.95 . This curve is what the FOC con-troller's closed-loop speed reg-u-la-tion and the thrust$\OMS/lmsy/m/n/10.95 !$\T1/lmr/m/n/10.95 duty-
- []
-
-[6]) (./chapters/03_dynamics.tex) (./chapters/04_vw_control.tex
+[6{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathex.enc}]) (./chapters/03_dynamics.tex) (./chapters/04_vw_control.tex
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <14.4> on input line 2.
 LaTeX Font Info:    External font `lmex10' loaded for size
@@ -847,6 +837,9 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 6.
 
 
+LaTeX Warning: Reference `sec:ekf' on page 12 undefined on input line 9.
+
+
 Overfull \hbox (77.35748pt too wide) in paragraph at lines 38--39
  [][] 
  []
@@ -891,22 +884,26 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
+
+
+LaTeX Warning: There were undefined references.
+
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 4A86048A5AE71B8801CCC3F9B45962C0;6141.
+(rerunfilecheck)             Checksum: 89ABBBA4BBFD0798458B755D9C0A14B0;5909.
  ) 
 Here is how much of TeX's memory you used:
- 26511 strings out of 474222
- 494962 string characters out of 5748733
+ 26508 strings out of 474222
+ 495145 string characters out of 5748734
  1946975 words of memory out of 5000000
- 48157 multiletter control sequences out of 15000+600000
+ 48155 multiletter control sequences out of 15000+600000
  675456 words of font info for 126 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,18n,87p,887b,901s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,18n,87p,890b,928s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texmf/fonts/type1/public/lm/lmbx10.pfb></usr/share/texmf/fonts/type1/public/lm/lmbx12.pfb></usr/share/texmf/fonts/type1/public/lm/lmbx8.pfb></usr/share/texmf/fonts/type1/public/lm/lmbx9.pfb></usr/share/texmf/fonts/type1/public/lm/lmex10.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi10.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi12.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi6.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi8.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi9.pfb></usr/share/texmf/fonts/type1/public/lm/lmmib10.pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf/fonts/type1/public/lm/lmr17.pfb></usr/share/texmf/fonts/type1/public/lm/lmr6.pfb></usr/share/texmf/fonts/type1/public/lm/lmr8.pfb></usr/share/texmf/fonts/type1/public/lm/lmr9.pfb></usr/share/texmf/fonts/type1/public/lm/lmri10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy8.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy9.pfb></usr/share/texmf/fonts/type1/public/lm/lmtk10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on main.pdf (17 pages, 528111 bytes).
+Output written on main.pdf (17 pages, 13080983 bytes).
 PDF statistics:
- 525 PDF objects out of 1000 (max. 8388607)
- 442 compressed objects within 5 object streams
- 110 named destinations out of 1000 (max. 500000)
- 269 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 517 PDF objects out of 1000 (max. 8388607)
+ 432 compressed objects within 5 object streams
+ 109 named destinations out of 1000 (max. 500000)
+ 271 words of extra memory for PDF output out of 10000 (max. 10000000)
 
