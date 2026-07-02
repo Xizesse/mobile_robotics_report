@@ -3,16 +3,16 @@
 \label{sec:system}
 % =============================================================================
 
-\textit{Lily} is a twin-thruster (differential-thrust) unmanned surface vehicle developed for autonomous survey and cooperative deploy/retrieve missions. The vehicle is controlled by a companion computer running ROS~2, bridged to a MAVLink-speaking autopilot (via \texttt{mavros}) that handles low-level attitude/position estimation, and interfaces with two brushless thrusters through VESC electronic speed controllers (ESCs) operating in Field-Oriented Control (FOC) mode.
+\textit{Lily} is a twin-thruster (differential-thrust) unmanned surface vehicle developed for autonomous survey and cooperative deploy/retrieve missions. The vehicle is controlled by a companion computer running ROS~2, bridged to a MAVLink autopilot (via \texttt{mavros}) that handles low-level attitude/position estimation, and interfaces with two brushless thrusters through VESC electronic speed controllers (ESCs) operating in Field-Oriented Control (FOC) mode.
 
 \subsection{Vehicle configuration and thruster layout}
 \label{sec:hull}
 
-The vehicle frame (\texttt{lily\_description/urdf/lily.urdf}) defines the sensor and actuator mounting points relative to \texttt{base\_link}, summarized in Table~\ref{tab:frames} and Figure~\ref{fig:layout}.
+The vehicle frame defines the sensor and actuator mounting points relative to \texttt{base\_link}, summarized in Table~\ref{tab:frames} and Figure~\ref{fig:layout}.
 
 \begin{table}[H]
 \centering
-\caption{Sensor and actuator mounting offsets relative to \texttt{base\_link} (URDF, meters).}
+\caption{Sensor and actuator mounting offsets relative to \texttt{base\_link} (meters).}
 \label{tab:frames}
 \begin{tabular}{@{}llccc@{}}
 \toprule
@@ -63,7 +63,7 @@ which is exactly the \texttt{wheel\_base} parameter ($0.66$~m) used throughout t
 
 \subsection{Compute and communications architecture}
 
-Figure~\ref{fig:arch} shows the software architecture. The companion computer runs ROS~2 nodes for guidance, control and perception; \texttt{mavros} bridges MAVLink telemetry/commands to/from the autopilot; the autopilot performs attitude and position estimation and exposes RC input, arming and mode services. In simulation, the same topic layout is reproduced by \texttt{ros\_gz\_bridge} against Gazebo (Section~\ref{sec:sim}), so the guidance/control stack is unmodified between sim and field deployment.
+Figure~\ref{fig:arch} shows the software architecture. The companion computer runs ROS~2 nodes for guidance, control and perception; \texttt{mavros} bridges MAVLink telemetry commands to and from the autopilot; the autopilot performs attitude and position estimation and redirects RC input, arming and mode services.
 
 \begin{figure}[H]
 \centering
@@ -90,18 +90,20 @@ Figure~\ref{fig:arch} shows the software architecture. The companion computer ru
 \label{fig:arch}
 \end{figure}
 
-\subsection{Localization: IMU/GPS fusion}
-\label{sec:ekf}
+\subsection{Localization and State Estimation}
+\label{sec:localization}
 
-Pose and velocity feedback used by every controller in this report (\texttt{nav\_msgs/Odometry} on \texttt{/usv/lily/mavros/local\_position/odom}) is a fused estimate produced by the autopilot's on-board Extended Kalman Filter (EKF), not by a node inside this ROS~2 workspace. The workspace only \emph{consumes} three autopilot outputs bridged by \texttt{mavros}:
-\begin{itemize}[nosep]
-    \item \texttt{/usv/lily/mavros/imu/data} (\texttt{sensor\_msgs/Imu}) -- angular rate and linear acceleration, high-rate strapdown input;
-    \item \texttt{/usv/lily/mavros/global\_position/raw/fix} (\texttt{sensor\_msgs/NavSatFix}) -- raw GPS fix;
-    \item \texttt{/usv/lily/mavros/local\_position/odom} (\texttt{nav\_msgs/Odometry}) -- the EKF's fused pose/twist output, and the only feedback signal used by \texttt{ControlLogic}, \texttt{VelocityController} and \texttt{MissionManager}.
+The vehicle's pose and velocity feedback, used by all high-level control systems, rely on an Extended Kalman Filter (EKF) running natively on the autopilot's onboard firmware. Rather than computing state estimates within the external companion computer workspace, the higher-level control architecture acts purely as a consumer of the autopilot's telemetry. 
+
+The onboard EKF operates as a black-box state estimator, fusing two primary sensor streams:
+\begin{itemize}
+    \item \textbf{High-rate Inertial Measurement Unit (IMU) data:} Providing angular rate and linear acceleration. For this 3~DoF Unmanned Surface Vehicle (USV), the critical components are planar accelerations and yaw rate. 
+    \item \textbf{Global Navigation Satellite System (GNSS/GPS) data:} Supplying raw global positioning fixes.
 \end{itemize}
-A local ENU datum is established once per session: in simulation, \texttt{gps\_origin\_publisher.py} parses the \texttt{<spherical\_coordinates>} tag of the loaded world's SDF file and republishes it as a \texttt{GeoPointStamped} on the same topic name the autopilot uses for its home/origin (\texttt{.../global\_position/gp\_origin}); on the real vehicle this is set by the autopilot at arming. \texttt{MissionManager} listens for this once, then converts every mission waypoint from geodetic (lat/lon) to local ENU with a flat-Earth approximation (Section~\ref{sec:gps2enu}).
 
-The filter itself runs as autopilot firmware (ArduSub/ArduPilot-class) and is not implemented, tuned, or modified anywhere in this ROS~2 workspace -- it is treated as a black box that is simply consumed through the three topics above.
+By fusing these inputs, the EKF produces a stabilized, continuous odometry signal containing the vehicle's fused pose and velocity (twist). This finalized estimate is the sole feedback signal driving the vehicle's control logic, velocity regulation, and mission management. 
+
+To map the global GPS data into a usable Cartesian space for 3~DoF planar control, a local East-North-Up (ENU) datum is established at the beginning of each operational session. In simulation environments, this origin is automatically parsed from the simulated world's configuration, whereas on the physical vehicle, it is initialized by the autopilot upon arming. Once this local datum is set, the mission manager converts all global geodetic waypoints (latitude and longitude) into local ENU coordinates using a flat-Earth approximation. This allows the USV to navigate using standard planar geometry relative to its starting location.
 
 \begin{center}
 \rednote{Should we dive into the EKF formulation (state vector, prediction/correction equations), or just describe that we used the ArduSub/ArduPilot on-board EKF as-is, without re-deriving it here?}
