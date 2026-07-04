@@ -19,4 +19,9 @@ The digital twin runs on \textbf{Gazebo Harmonic}, reusing several assets origin
 
 The \texttt{lily} Gazebo model (\texttt{lily\_gz/models/lily/model.sdf}) uses dedicated hull/housing/mount/propeller meshes and PBR textures. Five worlds are checked in: \texttt{empty} (unit testing), \texttt{feup} (campus pond, used for the square mission), \texttt{alqueva} and \texttt{viana}/\texttt{viana\_buoys} (larger reservoir/coastal environments, the latter with spawned red/dummy buoys for perception-in-the-loop testing), and \texttt{dynamic\_world} (\todored{describe the purpose of \texttt{dynamic\_world.sdf} -- e.g.\ moving obstacles/waves -- if used for the reported results}).
 
-\placeholderfig{11}{6}{Screenshot(s) of the Gazebo worlds used (e.g.\ \texttt{feup}, \texttt{viana\_buoys}), ideally showing the wave/wind effects described above.}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\linewidth]{figures/lily_gazebo.png}
+\caption{The \texttt{lily} vehicle model floating in the Gazebo Harmonic simulation, showing the hull and deck meshes on the water surface.}
+\label{fig:sim_world}
+\end{figure}

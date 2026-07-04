@@ -26,6 +26,6 @@
 \contentsline {subsection}{\numberline {7.3}Vehicle model and worlds}{14}{subsection.7.3}%
 \contentsline {section}{\numberline {8}Results}{14}{section.8}%
 \contentsline {subsection}{\numberline {8.1}$v$/$w$ tracking performance}{15}{subsection.8.1}%
-\contentsline {subsection}{\numberline {8.2}Trajectory-following performance}{16}{subsection.8.2}%
-\contentsline {subsection}{\numberline {8.3}Discussion}{16}{subsection.8.3}%
-\contentsline {section}{Conclusion}{17}{section*.23}%
+\contentsline {subsection}{\numberline {8.2}Trajectory-following performance}{17}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Discussion}{19}{subsection.8.3}%
+\contentsline {section}{Conclusion}{19}{section*.24}%

@@ -3,7 +3,16 @@
     "allow": [
       "Bash(pdflatex -interaction=nonstopmode -halt-on-error main.tex)",
       "Read(//tmp/**)",
-      "Bash(rm -f /tmp/latex_build.log /tmp/latex_build2.log; ls -la /home/motusxico/Desktop/LateX/rob_movel_report/chapters)"
+      "Bash(rm -f /tmp/latex_build.log /tmp/latex_build2.log; ls -la /home/motusxico/Desktop/LateX/rob_movel_report/chapters)",
+      "Read(//home/xizesse/ros2_ws/src/**)",
+      "Read(//home/xizesse/ros2_ws/src/lily/lily_control/cfg/**)",
+      "Bash(python3 pid_plots.py)",
+      "Bash(python3 -c ' *)",
+      "Bash(latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(find ~/ros2_ws/src/lily -ipath '*nav*' \\\\\\( -name '*.csv' -o -name '*log*' \\\\\\) 2>/dev/null | grep -iv install | head -30 *)",
+      "Read(//home/xizesse/ros2_ws/src/lily/**)",
+      "Bash(python3 scripts/traj_plots.py)"
     ],
     "additionalDirectories": [
       "/tmp"
